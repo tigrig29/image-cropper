@@ -5,24 +5,25 @@ import (
 	"image"
 	"image/png"
 	"os"
+	"strings"
 )
 
 type SubImager interface {
 	SubImage(r image.Rectangle) image.Image
 }
 
-func main() {
-	f, err := os.Open("../assets/images/c1-default-0.png")
+func GetCoordinateExcludingTransparentArea(filepath string) (image.Rectangle, error) {
+	f, err := os.Open(filepath)
 	if err != nil {
 		fmt.Println("open:", err)
-		return
+		return image.Rectangle{}, err
 	}
 	defer f.Close()
 
 	img, _, err := image.Decode(f)
 	if err != nil {
 		fmt.Println("decode:", err)
-		return
+		return image.Rectangle{}, err
 	}
 
 	bounds := img.Bounds()
@@ -57,14 +58,29 @@ func main() {
 		}
 	}
 
-	// ピクセル始点基準で判別しているため、 Max（終点）は +1 する
+	// Because the coordinate were acquired based on the starting point of the pixel,
+	// must add +1 to the Max value
 	coordinate.Max.X++
 	coordinate.Max.Y++
 
-	fmt.Printf("%d, %d, %d, %d \n", coordinate.Min.X, coordinate.Min.Y, coordinate.Max.X, coordinate.Max.Y)
-	fmt.Printf("%d, %d\n", coordinate.Dx(), coordinate.Dy())
+	return coordinate, nil
+}
 
-	fso, err := os.Create("../assets/images/c1-default-0.out.png")
+func CropImage(filepath string, coordinate image.Rectangle) {
+	f, err := os.Open(filepath)
+	if err != nil {
+		fmt.Println("open:", err)
+		return
+	}
+	defer f.Close()
+
+	img, _, err := image.Decode(f)
+	if err != nil {
+		fmt.Println("decode:", err)
+		return
+	}
+
+	fso, err := os.Create(strings.Replace(filepath, ".png", "-cropped.png", -1))
 	if err != nil {
 		fmt.Println("create:", err)
 		return
@@ -74,4 +90,15 @@ func main() {
 	cimg := img.(SubImager).SubImage(image.Rect(coordinate.Min.X, coordinate.Min.Y, coordinate.Max.X, coordinate.Max.Y))
 
 	png.Encode(fso, cimg)
+}
+
+func main() {
+	filepath := "../assets/images/c1-default-0.png"
+	coordinate, err := GetCoordinateExcludingTransparentArea(filepath)
+	if err != nil {
+		fmt.Println("GetCoordinateExcludingTransparentArea:", err)
+		return
+	}
+
+	CropImage(filepath, coordinate)
 }
