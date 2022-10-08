@@ -1,3 +1,3 @@
-module image-cropper
+module imagecropper
 
 go 1.18

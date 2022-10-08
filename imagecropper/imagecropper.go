@@ -1,31 +1,17 @@
-package main
+package imagecropper
 
 import (
 	"fmt"
 	"image"
 	"image/png"
 	"os"
-	"strings"
 )
 
 type SubImager interface {
 	SubImage(r image.Rectangle) image.Image
 }
 
-func GetCoordinateExcludingTransparentArea(filepath string) (image.Rectangle, error) {
-	f, err := os.Open(filepath)
-	if err != nil {
-		fmt.Println("open:", err)
-		return image.Rectangle{}, err
-	}
-	defer f.Close()
-
-	img, _, err := image.Decode(f)
-	if err != nil {
-		fmt.Println("decode:", err)
-		return image.Rectangle{}, err
-	}
-
+func GetCoordinateExcludingTransparentArea(img image.Image) (image.Rectangle, error) {
 	bounds := img.Bounds()
 	coordinate := image.Rectangle{
 		Min: image.Point{
@@ -66,21 +52,8 @@ func GetCoordinateExcludingTransparentArea(filepath string) (image.Rectangle, er
 	return coordinate, nil
 }
 
-func CropImage(filepath string, coordinate image.Rectangle) {
-	f, err := os.Open(filepath)
-	if err != nil {
-		fmt.Println("open:", err)
-		return
-	}
-	defer f.Close()
-
-	img, _, err := image.Decode(f)
-	if err != nil {
-		fmt.Println("decode:", err)
-		return
-	}
-
-	fso, err := os.Create(strings.Replace(filepath, ".png", "-cropped.png", -1))
+func CropImage(img image.Image, coordinate image.Rectangle, outfile string) {
+	fso, err := os.Create(outfile)
 	if err != nil {
 		fmt.Println("create:", err)
 		return
@@ -90,15 +63,4 @@ func CropImage(filepath string, coordinate image.Rectangle) {
 	cimg := img.(SubImager).SubImage(image.Rect(coordinate.Min.X, coordinate.Min.Y, coordinate.Max.X, coordinate.Max.Y))
 
 	png.Encode(fso, cimg)
-}
-
-func main() {
-	filepath := "../assets/images/c1-default-0.png"
-	coordinate, err := GetCoordinateExcludingTransparentArea(filepath)
-	if err != nil {
-		fmt.Println("GetCoordinateExcludingTransparentArea:", err)
-		return
-	}
-
-	CropImage(filepath, coordinate)
 }
