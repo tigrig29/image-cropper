@@ -3,8 +3,8 @@
   "dockerComposeFile": [
     "../docker-compose.yml"
   ],
-  "service": "app",
-  "workspaceFolder": "/go/src/work",
+  "service": "vncharcropper",
+  "workspaceFolder": "/go/src",
   "settings": {
     "go.toolsManagement.checkForUpdates": "off",
     "go.gopath": "/go",
@@ -17,6 +17,7 @@
     }
   },
   "extensions": [
-    "golang.go"
-  ],
+	"golang.go",
+	"donjayamanne.githistory"
+],
 }

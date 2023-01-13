@@ -1,3 +1,3 @@
-module imagecropper
+module vncharcropper
 
-go 1.18
+go 1.19
