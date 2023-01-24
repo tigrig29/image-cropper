@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"image/png"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -48,20 +49,39 @@ func hoge(basefilepath string, workpath string, outpath string) {
 		fmt.Println("readdir:", err)
 		return
 	}
+	CropImageFilesRecursive(files, coordinate, workpath, outpath)
+}
+
+func CropImageFilesRecursive(files []fs.FileInfo, coordinate image.Rectangle, workpath string, outpath string) {
 	for _, file := range files {
+		// 対象がディレクトリ → そのディレクトリに対して処理し直す
+		if file.IsDir() {
+			path := filepath.Join(workpath, file.Name())
+			childfiles, err := ioutil.ReadDir(path)
+			if err != nil {
+				fmt.Println("readdir:", err)
+				return
+			}
+			CropImageFilesRecursive(childfiles, coordinate, path, outpath)
+			return
+		}
+		// ファイルオープン
 		path := filepath.Join(workpath, file.Name())
 		f, err := os.Open(path)
 		if err != nil {
 			fmt.Println("open:", err)
 			return
 		}
+		// img 取得
 		img, _, err := image.Decode(f)
 		f.Close()
 		if err != nil {
 			fmt.Println("decode:", err)
 			return
 		}
-		CropImage(img, coordinate, outpath+"/"+file.Name())
+		// 切り取り
+		outfile := filepath.Join(outpath, file.Name())
+		CropImage(img, coordinate, outfile)
 	}
 }
 
