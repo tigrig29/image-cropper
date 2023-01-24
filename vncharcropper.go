@@ -10,9 +10,9 @@ import (
 )
 
 func main() {
-	basefilename := "c1-default-2.png"
+	basefilename := "c1-default-0.png"
 	basefilepath := "assets/" + basefilename
-	subpath := "assets/sub"
+	subpath := "assets"
 	outpath := "dist"
 
 	hoge(basefilename, basefilepath, subpath, outpath)
@@ -40,10 +40,8 @@ func hoge(basefilename string, basefilepath string, subpath string, outpath stri
 		return
 	}
 
-	coordinate.Min.Y = 0 //30
-
-	// 引数１の画像を α で切り取り → 引数３のフォルダに出力
-	CropImage(img, coordinate, outpath+"/"+basefilename)
+	// 上余白は身長表現に利用するので切り取り対象外 = 0 にする
+	coordinate.Min.Y = 0
 
 	// 引数２のフォルダにある全画像を α で切り取り → 引数３のフォルダに出力
 	files, err := ioutil.ReadDir(subpath)
