@@ -15,8 +15,10 @@ func main() {
 	subpath := "assets/sub"
 	outpath := "dist"
 
-	// 引数受け取り
+	hoge(basefilename, basefilepath, subpath, outpath)
+}
 
+func hoge(basefilename string, basefilepath string, subpath string, outpath string) {
 	// 引数１の画像をオープン
 	f, err := os.Open(basefilepath)
 	if err != nil {
