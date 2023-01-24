@@ -10,15 +10,14 @@ import (
 )
 
 func main() {
-	basefilename := "c1-default-0.png"
-	basefilepath := "assets/" + basefilename
-	subpath := "assets"
+	basefilepath := "assets/c1-default-0.png"
+	workpath := "assets"
 	outpath := "dist"
 
-	hoge(basefilename, basefilepath, subpath, outpath)
+	hoge(basefilepath, workpath, outpath)
 }
 
-func hoge(basefilename string, basefilepath string, subpath string, outpath string) {
+func hoge(basefilepath string, workpath string, outpath string) {
 	// 引数１の画像をオープン
 	f, err := os.Open(basefilepath)
 	if err != nil {
@@ -44,13 +43,13 @@ func hoge(basefilename string, basefilepath string, subpath string, outpath stri
 	coordinate.Min.Y = 0
 
 	// 引数２のフォルダにある全画像を α で切り取り → 引数３のフォルダに出力
-	files, err := ioutil.ReadDir(subpath)
+	files, err := ioutil.ReadDir(workpath)
 	if err != nil {
 		fmt.Println("readdir:", err)
 		return
 	}
 	for _, file := range files {
-		path := filepath.Join(subpath, file.Name())
+		path := filepath.Join(workpath, file.Name())
 		f, err := os.Open(path)
 		if err != nil {
 			fmt.Println("open:", err)
