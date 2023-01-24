@@ -68,13 +68,14 @@ func CropImageFilesRecursive(files []fs.FileInfo, coordinate image.Rectangle, wo
 	for _, file := range files {
 		// 対象がディレクトリ → そのディレクトリに対して処理し直す
 		if file.IsDir() {
-			path := filepath.Join(workpath, file.Name())
-			childfiles, err := ioutil.ReadDir(path)
+			workpath := filepath.Join(workpath, file.Name())
+			outpath := filepath.Join(outpath, file.Name())
+			files, err := ioutil.ReadDir(workpath)
 			if err != nil {
 				fmt.Println("readdir:", err)
 				return
 			}
-			CropImageFilesRecursive(childfiles, coordinate, path, outpath)
+			CropImageFilesRecursive(files, coordinate, workpath, outpath)
 			return
 		}
 		// ファイルオープン
@@ -90,6 +91,10 @@ func CropImageFilesRecursive(files []fs.FileInfo, coordinate image.Rectangle, wo
 		if err != nil {
 			fmt.Println("decode:", err)
 			return
+		}
+		// フォルダなかったら作成
+		if _, err := os.Stat(outpath); os.IsNotExist(err) {
+			os.Mkdir(outpath, os.ModePerm)
 		}
 		// 切り取り
 		outfile := filepath.Join(outpath, file.Name())
