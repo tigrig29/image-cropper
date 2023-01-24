@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	basefilepath := "assets/c1-default-0.png"
+	basefilepath := "assets/pose/c1-default-0.png"
 	workpath := "assets"
 	outpath := "dist"
 
@@ -66,6 +66,7 @@ func hoge(basefilepath string, workpath string, outpath string) {
 
 func CropImageFilesRecursive(files []fs.FileInfo, coordinate image.Rectangle, workpath string, outpath string) {
 	for _, file := range files {
+		fmt.Println(file.Name())
 		// 対象がディレクトリ → そのディレクトリに対して処理し直す
 		if file.IsDir() {
 			workpath := filepath.Join(workpath, file.Name())
@@ -76,7 +77,7 @@ func CropImageFilesRecursive(files []fs.FileInfo, coordinate image.Rectangle, wo
 				return
 			}
 			CropImageFilesRecursive(files, coordinate, workpath, outpath)
-			return
+			continue
 		}
 		// ファイルオープン
 		path := filepath.Join(workpath, file.Name())
@@ -94,7 +95,7 @@ func CropImageFilesRecursive(files []fs.FileInfo, coordinate image.Rectangle, wo
 		}
 		// フォルダなかったら作成
 		if _, err := os.Stat(outpath); os.IsNotExist(err) {
-			os.Mkdir(outpath, os.ModePerm)
+			os.MkdirAll(outpath, os.ModePerm)
 		}
 		// 切り取り
 		outfile := filepath.Join(outpath, file.Name())
