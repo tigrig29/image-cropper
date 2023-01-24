@@ -15,6 +15,18 @@ func main() {
 	workpath := "assets"
 	outpath := "dist"
 
+	err := os.RemoveAll(outpath)
+	if err != nil {
+		fmt.Println("remove outpath:", err)
+		return
+	}
+
+	err2 := os.Mkdir(outpath, os.ModePerm)
+	if err2 != nil {
+		fmt.Println("mkdir outpath:", err2)
+		return
+	}
+
 	hoge(basefilepath, workpath, outpath)
 }
 
